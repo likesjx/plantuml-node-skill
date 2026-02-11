@@ -1,17 +1,24 @@
 {
   "name": "plantuml-node-skill",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "Local-first PlantUML renderer CLI with optional remote fallback",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "plantuml-node-skill": "cli.js"
   },
-  "keywords": [],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "render:docs": "node scripts/render-docs.js"
+  },
+  "keywords": [
+    "plantuml",
+    "diagram",
+    "renderer"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "form-data": "^4.0.5",
     "node-fetch": "^2.7.0"
   }
 }

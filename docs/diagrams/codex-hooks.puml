@@ -1,0 +1,17 @@
+@startuml CodexHooks
+actor "Ops Engineer" as User
+participant "VPS (jane-vps)" as VPS
+participant "GitHub (repo + Actions)" as GH
+participant "Codex (diagnose)" as Codex
+participant "Architect (assistant)" as Architect
+
+User -> VPS: detect failure / label issue
+VPS -> GH: create issue (diagnose) / post logs
+GH -> Codex: workflow_dispatch (attach logs + prompt)
+Codex -> GH: return artifacts (script, checklist, runbook)
+GH -> User: comment with links to artifacts
+User -> Architect: request review / run script
+Architect -> VPS: run reviewed script with one-time SSH key
+VPS -> Architect: return output/logs
+Architect -> User: post results and update issue
+@enduml

@@ -1,0 +1,61 @@
+name: Node CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  render-diagrams:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Render docs diagrams
+        env:
+          PLANTUML_REMOTE_URL: ${{ secrets.PLANTUML_REMOTE_URL }}
+        run: |
+          if [ -z "${PLANTUML_REMOTE_URL}" ]; then
+            echo "PLANTUML_REMOTE_URL not set; skipping render commit-back."
+            exit 0
+          fi
+          npm run render:docs
+      - name: Commit rendered outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain docs/diagrams)" ]; then
+            echo "No diagram changes to commit."
+            exit 0
+          fi
+
+          git add docs/diagrams/*.png docs/diagrams/*.svg
+          git commit -m "chore(render): update generated diagrams [skip ci]"
+          git push

@@ -9,5 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "form-data": "^4.0.5",
+    "node-fetch": "^2.7.0"
+  }
 }

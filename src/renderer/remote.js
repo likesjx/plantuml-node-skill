@@ -1,4 +1,11 @@
 const fetch = require("node-fetch");
+const zlib = require("zlib");
+
+function plantumlEncodeZlib(pumlText) {
+  const compressed = zlib.deflateSync(Buffer.from(pumlText, "utf8"));
+  const stripped = compressed.slice(2, compressed.length - 4);
+  return stripped.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "~");
+}
 
 function withTimeout(ms) {
   const controller = new AbortController();
